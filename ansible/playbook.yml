@@ -31,10 +31,15 @@
           - containerd.io
         state: latest
 
-    - name: Install Docker Compose
-      get_url:
-        url: https://github.com/docker/compose/releases/download/v2.27.0/docker-compose-`uname -s`-`uname -m`
-        dest: /usr/local/bin/docker-compose
+    - name: Download Docker Compose binary
+      ansible.builtin.shell: |
+        curl -L "https://github.com/docker/compose/releases/download/v2.27.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+      args:
+        warn: false
+
+    - name: Make Docker Compose executable
+      ansible.builtin.file:
+        path: /usr/local/bin/docker-compose
         mode: '0755'
 
     - name: Create app directory
