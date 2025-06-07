@@ -11,7 +11,14 @@ jobs:
         steps:
         - name: Checkout code
           uses: actions/checkout@v2
+        
+        - name: SSH Keyscan
+          run: |
+            mkdir -p ~/.ssh
+            ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+            chmod 644 ~/.ssh/known_hosts
 
+            
         - name: Setup SSH
           uses: webfactory/ssh-agent@v0.8.0
           with:
