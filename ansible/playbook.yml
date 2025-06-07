@@ -42,7 +42,7 @@
         path: /usr/local/bin/docker-compose
         mode: '0755'
 
-    - name: Create app directory
+    - name: Create application directory
       file:
         path: /home/{{ ansible_user }}/app
         state: directory
@@ -56,7 +56,7 @@
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
 
-    - name: Copy frontend files
+    - name: Copy frontend files (with Dockerfile)
       copy:
         src: ../frontend
         dest: /home/{{ ansible_user }}/app/frontend
@@ -64,7 +64,7 @@
         group: "{{ ansible_user }}"
         mode: '0755'
 
-    - name: Copy backend files
+    - name: Copy backend files (with Dockerfile)
       copy:
         src: ../backend
         dest: /home/{{ ansible_user }}/app/backend
@@ -72,7 +72,7 @@
         group: "{{ ansible_user }}"
         mode: '0755'
 
-    - name: Build and start containers
+    - name: Build and start containers with Docker Compose v2
       community.docker.docker_compose_v2:
         project_src: /home/{{ ansible_user }}/app
         state: present
