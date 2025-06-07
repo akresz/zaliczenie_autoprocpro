@@ -1,0 +1,30 @@
+name: Deploy App
+
+on:
+    push:
+        branches:
+        - main
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+        - name: Checkout code
+          uses: actions/checkout@v2
+
+        - name: Setup SSH
+          uses: webfactory/ssh-agent@v0.8.0
+          with:
+            ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+        - name: Install Ansible
+          run: |
+            sudo apt-get update
+            sudo apt-get install -y ansible
+
+        - name: Install Docker collection
+          run: |
+            ansible-galaxy collection install community.docker
+
+        - name: Run Ansible playbook
+          run: |
+            ansible-playbook -i ansible/inventory.ini ansible/playbook.yml --extra-vars "ansible_user=${{ secrets.ANSIBLE_USER }}"
