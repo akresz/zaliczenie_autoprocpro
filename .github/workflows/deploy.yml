@@ -1,38 +1,39 @@
 name: Deploy App
 
 on:
-    push:
-        branches:
-        - main
-    workflow_dispatch:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
 jobs:
-    deploy:
-        runs-on: ubuntu-latest
-        steps:
-        - name: Checkout code
-          uses: actions/checkout@v2
-        
-        - name: SSH Keyscan
-          run: |
-            mkdir -p ~/.ssh
-            ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
-            chmod 644 ~/.ssh/known_hosts
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4  # Używaj najnowszej wersji!
 
-            
-        - name: Setup SSH
-          uses: webfactory/ssh-agent@v0.8.0
-          with:
-            ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Add SSH host to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
 
-        - name: Install Ansible
-          run: |
-            sudo apt-get update
-            sudo apt-get install -y ansible
+      - name: Setup SSH agent
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-        - name: Install Docker collection
-          run: |
-            ansible-galaxy collection install community.docker
+      - name: Install Ansible
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ansible
 
-        - name: Run Ansible playbook
-          run: |
-            ansible-playbook -i ansible/inventory.ini ansible/playbook.yml --extra-vars "ansible_user=${{ secrets.ANSIBLE_USER }}"
+      - name: Install community.docker collection
+        run: |
+          ansible-galaxy collection install community.docker
+
+      - name: Run Ansible playbook
+        run: |
+          ansible-playbook -i ansible/inventory.ini ansible/playbook.yml \
+            --extra-vars "ansible_user=${{ secrets.ANSIBLE_USER }}"
