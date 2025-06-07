@@ -9,9 +9,10 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4  # Używaj najnowszej wersji!
+        uses: actions/checkout@v4
 
       - name: Add server to known_hosts
         run: |
@@ -36,5 +37,4 @@ jobs:
 
       - name: Run Ansible playbook
         run: |
-          ansible-playbook -i ansible/inventory.ini ansible/playbook.yml \
-            --extra-vars "ansible_user=${{ secrets.ANSIBLE_USER }}"
+          ansible-playbook -i ansible/inventory.ini ansible/playbook.yml
